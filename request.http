@@ -1,0 +1,7 @@
+POST http://localhost:3001/post/new HTTP/1.1
+content-type: application/json
+
+{
+    "Geofencing_Name": "Geofencing_Name",
+    "Coord_Data": "Officia cillum duis tempor fugiat eiusmod laboris labore labore dolore proident."
+}
