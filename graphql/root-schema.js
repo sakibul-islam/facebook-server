@@ -66,10 +66,10 @@ const postBodyType = new GraphQLObjectType({
 	name: 'postBody',
 	fields: {
     caption: {type: GraphQLString},
-    photoURL: {type: GraphQLString}
+    photoURL: {type: GraphQLString},
+    videoURL: {type: GraphQLString}
 	}
 })
-
 
 const postType = new GraphQLObjectType({
 	name: "post",
@@ -104,6 +104,11 @@ const rootQueryType = new GraphQLObjectType({
 			type: GraphQLList(postType),
 			description: "Return posts",
 			resolve: async () => await Post.find().sort({time: 'desc'}),
+		},
+		videos: {
+			type: GraphQLList(postType),
+			description: "Return posts",
+			resolve: async () => await Post.find({"body.videoURL": { $exists: true }}),
 		},
     users: {
       type: GraphQLList(userType),

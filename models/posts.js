@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
 
+const reactType = {
+  type: Number,
+  default: 0
+}
+
 const postSchema = mongoose.Schema({
   userName: {
     type: String,
@@ -12,16 +17,17 @@ const postSchema = mongoose.Schema({
   },
   body: {
     caption: String,
-    photoURL: String
+    photoURL: String, 
+    videoURL: String
   },
 	reactions: {
-    like: Number,
-    haha: Number,
-    love: Number,
-    wow: Number,
-    care: Number,
-    sad: Number,
-    angry: Number,
+    like: reactType,
+    haha: reactType,
+    love: reactType,
+    wow: reactType,
+    care: reactType,
+    sad: reactType,
+    angry: reactType,
   },
   comments: [{
     userName: String,
