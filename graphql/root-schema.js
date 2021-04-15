@@ -31,6 +31,7 @@ const userType = new GraphQLObjectType({
 		photoURL: { type: GraphQLString },
 		userName: { type: GraphQLString },
 		nickName: { type: GraphQLString },
+		followers: { type: GraphQLInt },
 		photos: {
 			type: GraphQLList(GraphQLString),
 		},
@@ -84,7 +85,11 @@ const postType = new GraphQLObjectType({
 		user: {
 			type: userType,
 			description: "Return a user profile",
-			resolve: (parent) => profiles[parent.userName],
+			resolve: async (parent) => {
+				const user = await User.find({"userName" : parent.userName});
+				console.log(user[0])
+				return user[0];
+			},
 		},
 		reactions: {
 			type: reactionsType,
@@ -108,7 +113,7 @@ const rootQueryType = new GraphQLObjectType({
 		videos: {
 			type: GraphQLList(postType),
 			description: "Return posts",
-			resolve: async () => await Post.find({"body.videoURL": { $exists: true }}),
+			resolve: async () => await Post.find({"body.videoURL": { $exists: true }}).sort({time: 'desc'}),
 		},
     users: {
       type: GraphQLList(userType),
@@ -130,12 +135,16 @@ const rootQueryType = new GraphQLObjectType({
 		friendRequests: {
 			type: GraphQLList(userType),
 			description: "People who sent friend request",
-			resolve: () => friendRequests
+			resolve: async () => {
+				const users = await User.find({"userName" : { $all : ["harry", "ron"]}});
+				// console.log(typeof(users))
+				return users;
+			}
 		},
 		friendSuggestions: {
 			type: GraphQLList(userType),
 			description: "People You may know",
-			resolve: () => friendSuggestions
+			resolve: () => User.find()
 		}
 	},
 });

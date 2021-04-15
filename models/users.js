@@ -9,6 +9,7 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true
   },
+	followers: Number,
 	nickName: String,
 	photoURL: String,
 	coverURL: String,
