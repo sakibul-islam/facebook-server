@@ -25,9 +25,13 @@ app.use(
 );
 app.use(express.urlencoded({ extended: false }));
 
-app.get("/", (req, res) => {
-	res.send("Hello World");
-});
+// app.get("/", (req, res) => {
+// 	res.send("Hello World");
+// });
+
+app.use("/", express.static("../facebook/build"));
+app.use("/friends", express.static("../facebook/build"));
+app.use("/watch", express.static("../facebook/build"));
 
 app.use("/public", express.static("./public"));
 // app.use(upload.array());
@@ -56,9 +60,10 @@ app.post("/post/new", upload.single("photo"), function (req, res, next) {
 
 	function setUrl(file) {
 		let photoURL, videoURL;
-
+		if(!file) return;
 		if (file.mimetype.match("image")) {
-			photoURL = "http://localhost:3001/" + file.path;
+			photoURL = file.path;
+			console.log(__dirname)
 			return {photoURL}
 		} else if (file.mimetype.match("video")) {
 			videoURL = "http://localhost:3001/" + file.path;
@@ -66,6 +71,7 @@ app.post("/post/new", upload.single("photo"), function (req, res, next) {
 		}
 	}
 	console.log(setUrl(req.file))
+	
 	function savePostToDatabase(req) {
 		const {userName, caption} = req.body;
 		const url = setUrl(req.file);
