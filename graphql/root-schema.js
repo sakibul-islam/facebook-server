@@ -14,6 +14,9 @@ const {
 } = require("../profilesObj");
 const Post = require("../models/posts");
 const User = require("../models/users");
+const {dbConnect} = require("../utils/dbConnect");
+
+dbConnect()
 
 async function test() {
 	// profileArr.forEach(profile => {
@@ -66,7 +69,7 @@ const commentType = new GraphQLObjectType({
 			type: userType,
 			resolve: async (parent) => {
 				const user = await User.find({ userName: parent.userName });
-				console.log(user);
+				// console.log(user);
 				return user[0];
 			},
 		},
@@ -99,7 +102,7 @@ const postType = new GraphQLObjectType({
 			description: "Return a user profile",
 			resolve: async (parent) => {
 				const user = await User.find({ userName: parent.userName });
-				console.log(user[0]);
+				// console.log(user[0]);
 				return user[0];
 			},
 		},
@@ -143,7 +146,7 @@ const rootQueryType = new GraphQLObjectType({
 			},
 			resolve: async (parent, { userName }) => {
 				const user = await User.find({ userName: userName });
-				console.log(user[0]);
+				// console.log(user[0]);
 				return user[0];
 			},
 		},
@@ -182,7 +185,8 @@ const rootMutationType = new GraphQLObjectType({
 						caption,
 					},
 				});
-				console.log(post.save().then(console.log));
+				// console.log(post.save().then(console.log));
+				post.save().then(console.log)
 				return post;
 			},
 		},
@@ -210,7 +214,7 @@ const rootMutationType = new GraphQLObjectType({
 				const post = Post.findByIdAndUpdate(postID, {
 					$push: { comments: [{ userName, body: comment }] },
 				}, {new: true});
-				console.log(post);
+				// console.log(post);
 				return post;
 			},
 		},

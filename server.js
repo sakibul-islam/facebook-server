@@ -29,12 +29,14 @@ app.use(express.urlencoded({ extended: false }));
 // 	res.send("Hello World");
 // });
 
-app.use("/", express.static("../facebook/build"));
-app.use("/friends", express.static("../facebook/build"));
-app.use("/watch", express.static("../facebook/build"));
+// app.use("/", express.static("../facebook/build"));
+// app.use("/friends", express.static("../facebook/build"));
+// app.use("/watch", express.static("../facebook/build"));
 
 app.use("/public", express.static("./public"));
 // app.use(upload.array());
+
+app.use(express.static(path.join(__dirname, "client/build")))
 
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
@@ -56,7 +58,9 @@ const upload = multer({ storage: storage });
 
 app.post("/post/new", upload.single("photo"), function (req, res, next) {
 	console.log(req.body);
-	console.log(req.file);
+	console.log(req.file.size);
+
+	if(req.file.size > 5000000) return res.status(500).send({message: "Larger file is not allowed to post"})
 
 	function setUrl(file) {
 		let photoURL, videoURL;
