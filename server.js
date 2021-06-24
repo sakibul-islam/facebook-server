@@ -9,6 +9,7 @@ var multer = require("multer");
 const { graphqlHTTP } = require("express-graphql");
 const { rootSchema } = require("./graphql/root-schema");
 const mongoose = require("mongoose");
+const port = process.env.PORT || 4000;
 
 mongoose.connect("mongodb://localhost/facebook", {
 	useNewUrlParser: true,
@@ -36,7 +37,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/public", express.static("./public"));
 // app.use(upload.array());
 
-app.use(express.static(path.join(__dirname, "client/build")))
+app.use(express.static(path.join(__dirname, "client/build")));
+app.get("*", (req, res) => {
+	res.sendFile(path.join(__dirname, "client/build", "index.html"));
+});
 
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
@@ -57,43 +61,48 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 app.post("/post/new", upload.single("photo"), function (req, res, next) {
-	console.log(req.body);
-	console.log(req.file.size);
+	const {body, file} = req;
+	console.log(body);
 
-	if(req.file.size > 5000000) return res.status(500).send({message: "Larger file is not allowed to post"})
+	if(file && file.size > 3000000) {
+		return res.status(500).json({
+			success: false,
+			message: "Files more than 3MB is not allowed to post",
+		});
+	}
 
 	function setUrl(file) {
 		let photoURL, videoURL;
-		if(!file) return;
+		if (!file) return;
 		if (file.mimetype.match("image")) {
 			photoURL = file.path;
-			console.log(__dirname)
-			return {photoURL}
+			console.log(__dirname);
+			return { photoURL };
 		} else if (file.mimetype.match("video")) {
 			videoURL = "http://localhost:3001/" + file.path;
-			return {videoURL}
+			return { videoURL };
 		}
 	}
-	console.log(setUrl(req.file))
-	
+	console.log(setUrl(file));
+
 	function savePostToDatabase(req) {
-		const {userName, caption} = req.body;
-		const url = setUrl(req.file);
+		const { userName, caption } = body;
+		const url = setUrl(file);
 		const post = new Post({
 			userName,
 			body: {
 				caption,
-				...url
+				...url,
 			},
 		});
 		return post.save();
 	}
 	savePostToDatabase(req).then(console.log);
-	res.send(200);
+	res.status(200);
 });
 
 app.get("/public/uploads:");
 
-app.listen(3001, () => {
-	console.log("server is listing 3001");
+app.listen(port, () => {
+	console.log("server is listing at port: " + port);
 });

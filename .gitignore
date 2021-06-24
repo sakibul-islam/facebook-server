@@ -43,6 +43,10 @@ public
 public/uploads
 jspm_packages/
 
+posts.js
+request.http
+profilesObj.js
+
 # TypeScript v1 declaration files
 typings/
 
